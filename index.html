@@ -393,9 +393,71 @@
         transform: translateY(0);
       }
     }
+  
+    /* Luxury Capsule Preloader (Zero Latency, Pure CSS) */
+    #loader-screen {
+      position: fixed;
+      inset: 0;
+      background-color: var(--bg-base);
+      z-index: 999999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s ease;
+      pointer-events: auto;
+    }
+
+    #loader-screen.fade-out {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .loader-capsule {
+      position: relative;
+      width: 165px;
+      height: 18px;
+      border-radius: 999px;
+      border: 1.5px solid #b8865d;
+      background: rgba(255, 255, 255, 0.55);
+      box-shadow: 0 4px 16px -2px rgba(184, 134, 93, 0.22), inset 0 1px 2px rgba(0, 0, 0, 0.04);
+      overflow: hidden;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .loader-fill {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 48%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(184, 134, 93, 0.08) 0%, #b8865d 50%, rgba(184, 134, 93, 0.08) 100%);
+      animation: capsuleShimmer 1.35s ease-in-out infinite;
+      box-shadow: 0 0 10px rgba(184, 134, 93, 0.45);
+    }
+
+    @keyframes capsuleShimmer {
+      0% {
+        transform: translateX(-100%);
+      }
+      100% {
+        transform: translateX(250%);
+      }
+    }
+
   </style>
 </head>
 <body>
+  <!-- Fast Luxury Preloader -->
+  <div id="loader-screen" aria-hidden="true">
+    <div class="loader-capsule">
+      <div class="loader-fill"></div>
+    </div>
+  </div>
+
   <!-- Animated luxury ambient texture -->
   <div class="bg-canvas" aria-hidden="true">
     <div class="orb orb-1"></div>
@@ -521,6 +583,24 @@
       }
       document.body.removeChild(ta);
     }
+  
+    // Fast Dismiss for Preloader
+    function dismissLoader() {
+      const loader = document.getElementById('loader-screen');
+      if (loader && !loader.classList.contains('fade-out')) {
+        loader.classList.add('fade-out');
+      }
+    }
+
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      setTimeout(dismissLoader, 200);
+    } else {
+      window.addEventListener('DOMContentLoaded', () => setTimeout(dismissLoader, 200));
+      window.addEventListener('load', dismissLoader);
+    }
+    // Safety fallback for slow / 3G connections
+    setTimeout(dismissLoader, 2000);
+
   </script>
 </body>
 </html>
